@@ -1,8 +1,9 @@
-angular.module('flapperNews', [])
+angular.module('flapperNews', ['ui.router'])
 .controller('MainCtrl',[
 	'$scope',
-	function($scope){
-		$scope.test="Hello world!";
+	'posts',
+	function($scope, posts){
+		$scope.posts = posts.posts;
 		$scope.posts = [
 			{title:'post 1', upvotes: 5},
 			{title:'post 2', upvotes: 2},
@@ -12,8 +13,13 @@ angular.module('flapperNews', [])
 		];
 		$scope.addPost= function(){
 			if(!$scope.title|| $scope.title ===''){return;}
-			$scope.posts.push({title: $scope.title, upvotes: 0});
+			$scope.posts.push({
+				title: $scope.title, 
+				link: $scope.link,
+				upvotes: 0
+			});
 			$scope.title='';
+			$scope.link='';
 		};
 		$scope.incrementUpvotes= function(post){
 			post.upvotes += 1;
@@ -21,3 +27,28 @@ angular.module('flapperNews', [])
 	}
 
 	])
+.factory('posts',[function(){
+	var o = {
+		posts:[]
+	};
+	return o;
+}])
+.config([
+'$stateProvider',
+'$urlRouterProvider',
+function($stateProvider, $urlRouterProvider) {
+
+  $stateProvider
+    .state('home', {
+      url: '/home',
+      templateUrl: '/home.html',
+      controller: 'MainCtrl'
+    });
+    .state('posts',{
+    	url: '/posts/{id}',
+    	templateUrl: '/posts.html',
+    	controller: 'PostsCtrl'
+    });
+
+  $urlRouterProvider.otherwise('home');
+}])
